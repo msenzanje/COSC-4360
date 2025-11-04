@@ -8,44 +8,47 @@ client_socket = socket(AF_INET, SOCK_DGRAM)
 # Server address
 server_port = 9999
 
-# Check Argument File
-if len(sys.argv) != 3:
-    print(f"Usage: python {sys.argv[0]} <server_ip> <message>")
+# Check for correct number of arguments
+if len(sys.argv) != 2:
+    print(f"Usage: python {sys.argv[0]} <server_ip>")
     sys.exit(1)
 
-# Arguments from terminal
 server_ip = sys.argv[1]
-ping_message = sys.argv[2]
+
+# The three sentences
+sentences = [
+    "I'm deeply passionate about computer networking because it's the foundation of our interconnected world, enabling seamless communication, data sharing, and the backbone of the digital age.",
+    "The intricacies of routing, protocols, and network security fascinate me, and I find immense joy in troubleshooting and optimizing network performance to ensure a smooth online experience for users.",
+    "Studying computer networking isn't just a subject for me; it's a lifelong journey filled with endless fascination, innovation, and the thrill of mastering the technology that keeps our modern world connected."
+]
 
 try:
-    start_time = time.time()
-    
-    # Send the ping
-    client_socket.sendto(ping_message.encode(), (server_ip, server_port))
+    for sentence in sentences:
+        try:
+            start_time = time.time()
 
-    # Receive the pong
-    pong, server_address = client_socket.recvfrom(2048)
-    
-    end_time = time.time()
-    rtt = end_time - start_time
+            # Send ping
+            client_socket.sendto(sentence.encode(), (server_ip, server_port))
 
-    length = len(pong.decode()) * 8
+            # Receive pong
+            pong, server_address = client_socket.recvfrom(4096)
 
-    # Convert RTT to milliseconds
-    rtt_ms = rtt * 1000
-    
-    # Calculate throughput in Mbps (message size in bits / RTT in seconds)
-    throughput = (length / rtt) / 1000000  # Convert to Mbps
-    
-    
-    # Display results in the required format
-    print(f"Sentence: {pong.decode()}")
-    print(f"Length: {length} bits")
-    print(f"RTT: {rtt_ms:.2f} ms")
-    print(f"Throughput: {throughput:.1f} Mbps")
+            end_time = time.time()
+            rtt = end_time - start_time
 
-except Exception as e:
-    print(f"Error: {e}")
+            # Compute metrics
+            length = len(sentence.encode()) * 8
+            rtt_ms = rtt * 1000
+            throughput_mbps = (length / rtt) / 1_000_000 if rtt > 0 else 0.0
+
+            # Print results
+            print(f"Sentence: {sentence}")
+            print(f"Length: {length} bits")
+            print(f"RTT: {rtt_ms:.2f} ms")
+            print(f"Throughput: {throughput_mbps:.1f} Mbps\n")
+
+        except error as err:
+            print(f"Error: {err}")
+
 finally:
-    # Close the socket
     client_socket.close()
