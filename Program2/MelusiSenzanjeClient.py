@@ -23,16 +23,26 @@ try:
     # Send the ping
     client_socket.sendto(ping_message.encode(), (server_ip, server_port))
 
-    # Receive the pong (with 2048 buffer size to accommodate the long message)
+    # Receive the pong
     pong, server_address = client_socket.recvfrom(2048)
     
-    # Calculate round-trip time
     end_time = time.time()
     rtt = end_time - start_time
+
+    length = len(pong.decode()) * 8
+
+    # Convert RTT to milliseconds
+    rtt_ms = rtt * 1000
     
-    print(f"\nPing message sent to server")
-    print(f"Pong received from server")
-    print(f"Round-trip time: {rtt:.6f} seconds")
+    # Calculate throughput in Mbps (message size in bits / RTT in seconds)
+    throughput = (length / rtt) / 1000000  # Convert to Mbps
+    
+    
+    # Display results in the required format
+    print(f"Sentence: {pong.decode()}")
+    print(f"Length: {length} bits")
+    print(f"RTT: {rtt_ms:.2f} ms")
+    print(f"Throughput: {throughput:.1f} Mbps")
 
 except Exception as e:
     print(f"Error: {e}")

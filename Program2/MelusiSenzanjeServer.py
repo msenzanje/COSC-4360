@@ -10,5 +10,5 @@ while True:
     # Receive the client packet (data) and the source address
     message, client_address = server_socket.recvfrom(2048)
 
-    print(f'\nReceived ping from {client_address}: {message.decode()}')
-    server_socket.sendto(message.decode(), client_address)
+    print(f'\nReceived from {client_address}: {message.decode()}')
+    server_socket.sendto(message, client_address)
